@@ -1,7 +1,11 @@
+import 'package:dev_quiz/core/core.dart';
+import 'package:dev_quiz/home/home_controller.dart';
 import 'package:dev_quiz/home/widgets/app_bar/app_bar_widget.dart';
 import 'package:dev_quiz/home/widgets/level_button/level_button_widget.dart';
 import 'package:dev_quiz/home/widgets/quiz_card/quiz_card.widget.dart';
 import 'package:flutter/material.dart';
+
+import 'home_state.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -10,50 +14,76 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final controller = HomeController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller.getUser();
+    controller.getQuizzes();
+    controller.stateNotifier.addListener(() {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBarWidget(),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(height: 24),
-                  LevelButtonWidget(
-                    label: "Fácil",
+    if (controller.state == HomeState.success) {
+      return Scaffold(
+          appBar: AppBarWidget(user: controller.user!),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LevelButtonWidget(
+                        label: "Fácil",
+                      ),
+                      LevelButtonWidget(
+                        label: "Médio",
+                      ),
+                      LevelButtonWidget(
+                        label: "Difícil",
+                      ),
+                      LevelButtonWidget(
+                        label: "Perito",
+                      ),
+                    ],
                   ),
-                  LevelButtonWidget(
-                    label: "Médio",
-                  ),
-                  LevelButtonWidget(
-                    label: "Difícil",
-                  ),
-                  LevelButtonWidget(
-                    label: "Perito",
-                  ),
-                ],
-              ),
-              SizedBox(height: 24),
-              Expanded(
-                child: GridView.count(
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  crossAxisCount: 2,
-                  children: [
-                    QuizCardWidget(),
-                    QuizCardWidget(),
-                    QuizCardWidget(),
-                    QuizCardWidget(),
-                    QuizCardWidget()
-                  ],
                 ),
-              ),
-              SizedBox(height: 24)
-            ],
+                SizedBox(height: 24),
+                Expanded(
+                  child: GridView.count(
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    crossAxisCount: 2,
+                    children: controller.quizzes!
+                        .map((e) => QuizCardWidget(
+                              title: e.title,
+                              completed:
+                                  "${e.questionAnswered}/${e.questions.length}",
+                              percent: e.questionAnswered / e.questions.length,
+                            ))
+                        .toList(),
+                  ),
+                ),
+                SizedBox(height: 24)
+              ],
+            ),
+          ));
+    } else {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkGreen),
           ),
-        ));
+        ),
+      );
+    }
   }
 }
