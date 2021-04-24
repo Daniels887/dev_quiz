@@ -22,6 +22,25 @@
             "isRight": true
           }
         ]
+      },
+      {
+        "title": "Esta curtindo o react", 
+        "answers": [
+          {
+            "title": "Estou curtindo"
+          },
+          {
+            "title": "Estou adorando",
+            "isRight": true
+
+          },
+          {
+            "title": "Amando Flutter"
+          },
+          {
+            "title": "Show de bola"
+          }
+        ]
       }
     ]
   }
